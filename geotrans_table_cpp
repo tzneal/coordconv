@@ -1,0 +1,43 @@
+#include "CoordinateSystem/mgrs/MGRS.h"
+#include "CoordinateSystem/ups/UPS.h"
+#include "CoordinateTuples/GeodeticCoordinates.h"
+#include "CoordinateTuples/MGRSorUSNGCoordinates.h"
+#include "CoordinateTuples/UPSCoordinates.h"
+#include "CoordinateSystem/polarst/PolarStereographic.h"
+#include <cmath>
+#include <cstdio>
+#include <iostream>
+int main() {
+  const double ellipsoidSemiMajorAxis = 6378137.0;
+  const double ellipsoidFlattening = 1 / 298.257223563;
+  MSP::CCS::MGRS mgrsc(ellipsoidSemiMajorAxis, ellipsoidFlattening, "WE");
+  MSP::CCS::UPS ups(ellipsoidSemiMajorAxis, ellipsoidFlattening);
+  //PolarStereographic( double ellipsoidSemiMajorAxis, double ellipsoidFlattening, double centralMeridian, double standardParallel, double falseEasting, double falseNorthing );
+  MSP::CCS::PolarStereographic ps(ellipsoidSemiMajorAxis, ellipsoidFlattening);
+
+  MSP::CCS::GeodeticCoordinates *geo = new MSP::CCS::GeodeticCoordinates();
+
+  long precision = 5;
+  double latBound = M_PI / 2 + 0.1;
+  double lngBound = M_PI + 0.1;
+  for (double lat = -latBound; lat < latBound; lat += latBound / 1000) {
+    for (double lng = -lngBound; lng < lngBound; lng += lngBound / 1000) {
+      geo->set(lng, lat, 0);
+      MSP::CCS::MGRSorUSNGCoordinates *mgrs;
+      MSP::CCS::UPSCoordinates *upsC;
+      MSP::CCS::PolarStereographic *polar;
+      try {
+        polar = mgrsc.convertFromGeodetic(geo, precision);
+        mgrs = tmp.convertFromGeodetic(geo, precision);
+        upsC = ups.convertFromGeodetic(geo);
+      } catch (...) {
+        printf("%a %a %a %a %c %s\n", lat, lng, 0.0, 0.0, 'E', "ERR");
+        continue;
+      }
+
+      printf("%a %a %a %a %c %s\n", lat, lng, upsC->easting(), upsC->northing(),
+             upsC->hemisphere(), to->MGRSString());
+    }
+  }
+  return 0;
+}
