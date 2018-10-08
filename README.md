@@ -19,7 +19,7 @@ Usage
 Constructors are provided so you can use custom ellipsoid parameters, but defaults are
 provided for WGS84:
 
-```
+```go
   mgrs, _ := coordconv.DefaultMGRSConverter.ConvertFromGeodetic(s2.LatLngFromDegrees(0, 0), 5)
   fmt.Println(mgrs) // 31NAA6602100000
   geo, _ := coordconv.DefaultMGRSConverter.ConvertToGeodetic("16SGC3855124838")
@@ -29,7 +29,7 @@ provided for WGS84:
 License
 =======
 
-As the geotrans code it was based on is public domain, this is public domain as
+As the [geotrans code](http://earth-info.nga.mil/GandG/update/index.php?action=home#tab_wgs84-data) it was based on is public domain, this is public domain as
 well.  I've only done a straight forward port from C++ to Go, making some minor
 changes along the way to make it behave a bit more like like standard Go code
 (e.g. returning an error when the C++ code threw an exception)
