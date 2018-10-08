@@ -29,7 +29,4 @@ provided for WGS84:
 License
 =======
 
-As the [geotrans code](http://earth-info.nga.mil/GandG/update/index.php?action=home#tab_wgs84-data) it was based on is public domain, this is public domain as
-well.  I've only done a straight forward port from C++ to Go, making some minor
-changes along the way to make it behave a bit more like like standard Go code
-(e.g. returning an error when the C++ code threw an exception)
+The [geotrans code](http://earth-info.nga.mil/GandG/update/index.php?action=home#tab_wgs84-data) is public domain, so in spirit this is public domain as well.  I only made minor changes along the way to make it behave a bit more like like standard Go code (e.g. returning an error when the C++ code threw an exception)
