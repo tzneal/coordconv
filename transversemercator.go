@@ -9,10 +9,13 @@ import (
 	"github.com/golang/geo/s2"
 )
 
+const nTerms = 6
+
 type TransverseMercator struct {
-	CoordinateSystem
 	// Ellipsoid Parameters
-	ellipsCode string // 2 Letter ellipsoid code
+	semiMajorAxis float64
+	flattening    float64
+	ellipsCode    string // 2 Letter ellipsoid code
 
 	tranMercEps float64 // Eccentricity
 
@@ -510,7 +513,7 @@ func (t *TransverseMercator) generateCoefficients(invfla float64, n1 *float64,
 	coeff += n6 / 256.0
 	coeff += n4 / 64.0
 	coeff += n2 / 4
-	coeff += 1
+	coeff++
 	*R4oa = coeff / (1 + *n1)
 }
 
@@ -545,8 +548,8 @@ func (t *TransverseMercator) checkLatLon(latitude, deltaLon float64) error {
 	if delta < testAngle {
 		testAngle = delta
 	}
-	const MAX_DELTA_LONG = ((math.Pi * 70) / 180.0)
-	if testAngle > MAX_DELTA_LONG {
+	const maxDeltaLong = ((math.Pi * 70) / 180.0)
+	if testAngle > maxDeltaLong {
 		return errors.New("longitude out of range")
 	}
 	return nil
@@ -603,8 +606,7 @@ func (t *TransverseMercator) latLonToNorthingEasting(latitude, longitude float64
 	xStar := 0.0
 	yStar := 0.0
 
-	const N_TERMS = 6
-	for k := N_TERMS - 1; k >= 0; k-- {
+	for k := nTerms - 1; k >= 0; k-- {
 		xStar += t.tranMercACoeff[k] * s2ku[k] * c2kv[k]
 		yStar += t.tranMercACoeff[k] * c2ku[k] * s2kv[k]
 	}
@@ -750,8 +752,7 @@ func (t *TransverseMercator) northingEastingToLatLon(northing,
 	U := 0.0
 	V := 0.0
 
-	const N_TERMS = 6
-	for k := N_TERMS - 1; k >= 0; k-- {
+	for k := nTerms - 1; k >= 0; k-- {
 		U += t.tranMercBCoeff[k] * s2kx[k] * c2ky[k]
 		V += t.tranMercBCoeff[k] * c2kx[k] * s2ky[k]
 	}

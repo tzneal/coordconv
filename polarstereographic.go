@@ -8,13 +8,9 @@ import (
 	"github.com/golang/geo/s2"
 )
 
-type CoordinateSystem struct {
-	semiMajorAxis float64
-	flattening    float64
-}
-
 type PolarStereographic struct {
-	CoordinateSystem
+	semiMajorAxis        float64
+	flattening           float64
 	es                   float64 // Eccentricity of ellipsoid
 	esOverTwo            float64 // es / 2.0
 	isSouthernHemisphere bool    // Flag variable
@@ -216,14 +212,14 @@ func MakePolarStereographicScaleFactor(ellipsoidSemiMajorAxis,
 		math.Sqrt(math.Pow(onePlusEs, onePlusEs) * math.Pow(oneMinusEs, oneMinusEs))
 
 	sk := 0.0
-	sk_PLUS_1 := -1 + 2*p.polarScaleFactor
-	for math.Abs(sk_PLUS_1-sk) > tolerance && count != 0 {
-		sk = sk_PLUS_1
-		onePlusEs_sk := 1.0 + p.es*sk
-		oneMinusEs_sk := 1.0 - p.es*sk
-		sk_PLUS_1 = ((2 * p.polarScaleFactor *
-			math.Sqrt(math.Pow(onePlusEs_sk, onePlusEs)*
-				math.Pow(oneMinusEs_sk, oneMinusEs))) /
+	skPlus1 := -1 + 2*p.polarScaleFactor
+	for math.Abs(skPlus1-sk) > tolerance && count != 0 {
+		sk = skPlus1
+		onePlusEsSk := 1.0 + p.es*sk
+		oneMinusEsSk := 1.0 - p.es*sk
+		skPlus1 = ((2 * p.polarScaleFactor *
+			math.Sqrt(math.Pow(onePlusEsSk, onePlusEs)*
+				math.Pow(oneMinusEsSk, oneMinusEs))) /
 			p.polarK90) - 1
 		count--
 	}
@@ -233,8 +229,8 @@ func MakePolarStereographicScaleFactor(ellipsoidSemiMajorAxis,
 	}
 
 	standardParallel := 0.0
-	if sk_PLUS_1 >= -1.0 && sk_PLUS_1 <= 1.0 {
-		standardParallel = math.Asin(sk_PLUS_1)
+	if skPlus1 >= -1.0 && skPlus1 <= 1.0 {
+		standardParallel = math.Asin(skPlus1)
 	} else {
 		return nil, errors.New("origin latitude error")
 	}
