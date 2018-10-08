@@ -13,7 +13,8 @@ import (
 
 // MGRS is an coordinate converter to and from MGRS coordinates.
 type MGRS struct {
-	CoordinateSystem
+	semiMajorAxis     float64
+	flattening        float64
 	ups               *UPS
 	utm               *UTM
 	MGRSEllipsoidCode string
@@ -60,7 +61,7 @@ const clarke1880 = "CD"
 const bessel1841 = "BR"
 const bessel1841Namibia = "BN"
 
-type Latitude_Band struct {
+type latitudeBand struct {
 	letter         int     // letter representing latitude band
 	minNorthing    float64 // minimum northing for latitude band
 	north          float64 // upper latitude for latitude band
@@ -68,7 +69,7 @@ type Latitude_Band struct {
 	northingOffset float64 // latitude band northing offset
 }
 
-var Latitude_Band_Table = [20]Latitude_Band{
+var latitudeBands = [20]latitudeBand{
 	{letterC, 1100000.0, -72.0, -80.5, 0.0},
 	{letterD, 2000000.0, -64.0, -72.0, 2000000.0},
 	{letterE, 2800000.0, -56.0, -64.0, 2000000.0},
@@ -755,7 +756,9 @@ func (m *MGRS) toUTM(zone int, letters []byte, easting, northing float64, precis
 
 	// check that point is within Zone Letter bounds
 	geodeticCoordinates, err := m.utm.ConvertToGeodetic(utmCoordinates)
-
+	if err != nil {
+		return UTMCoord{}, err
+	}
 	latitude := geodeticCoordinates.Lat.Radians()
 
 	divisor := 100000 / computeScale(precision)
@@ -805,18 +808,18 @@ func (m *MGRS) toUTM(zone int, letters []byte, easting, northing float64, precis
 }
 
 // getLatitudeBandMinNorthing receives a latitude band letter and uses the
-// Latitude_Band_Table to determine the minimum northing and northing offset for
+// latitudeBands to determine the minimum northing and northing offset for
 // that latitude band letter.
 func (m *MGRS) getLatitudeBandMinNorthing(letter byte) (minNorthing, northingOffset float64, err error) {
 	if (letter >= letterC) && (letter <= letterH) {
-		minNorthing = Latitude_Band_Table[letter-2].minNorthing
-		northingOffset = Latitude_Band_Table[letter-2].northingOffset
+		minNorthing = latitudeBands[letter-2].minNorthing
+		northingOffset = latitudeBands[letter-2].northingOffset
 	} else if (letter >= letterJ) && (letter <= letterN) {
-		minNorthing = Latitude_Band_Table[letter-3].minNorthing
-		northingOffset = Latitude_Band_Table[letter-3].northingOffset
+		minNorthing = latitudeBands[letter-3].minNorthing
+		northingOffset = latitudeBands[letter-3].northingOffset
 	} else if (letter >= letterP) && (letter <= letterX) {
-		minNorthing = Latitude_Band_Table[letter-4].minNorthing
-		northingOffset = Latitude_Band_Table[letter-4].northingOffset
+		minNorthing = latitudeBands[letter-4].minNorthing
+		northingOffset = latitudeBands[letter-4].northingOffset
 	} else {
 		err = errors.New("invalid MGRS")
 	}
@@ -912,19 +915,19 @@ func (m *MGRS) toUPS(
 }
 
 // inLatitudeRange receives a latitude band letter and uses the
-// Latitude_Band_Table to determine the latitude band boundaries for that
+// latitudeBands to determine the latitude band boundaries for that
 // latitude band letter.
 func (m *MGRS) inLatitudeRange(letter byte, latitude, border float64) (bool, error) {
 	var north, south float64
 	if (letter >= letterC) && (letter <= letterH) {
-		north = Latitude_Band_Table[letter-2].north * math.Pi / 180
-		south = Latitude_Band_Table[letter-2].south * math.Pi / 180
+		north = latitudeBands[letter-2].north * math.Pi / 180
+		south = latitudeBands[letter-2].south * math.Pi / 180
 	} else if (letter >= letterJ) && (letter <= letterN) {
-		north = Latitude_Band_Table[letter-3].north * math.Pi / 180
-		south = Latitude_Band_Table[letter-3].south * math.Pi / 180
+		north = latitudeBands[letter-3].north * math.Pi / 180
+		south = latitudeBands[letter-3].south * math.Pi / 180
 	} else if (letter >= letterP) && (letter <= letterX) {
-		north = Latitude_Band_Table[letter-4].north * math.Pi / 180
-		south = Latitude_Band_Table[letter-4].south * math.Pi / 180
+		north = latitudeBands[letter-4].north * math.Pi / 180
+		south = latitudeBands[letter-4].south * math.Pi / 180
 	} else {
 		return false, errors.New("invalid MGRS")
 	}
@@ -946,7 +949,7 @@ func toupper(b byte) byte {
 	return byte(unicode.ToUpper(rune(b)))
 }
 
-// getLatitudeLetter receives a latitude value and uses the Latitude_Band_Table
+// getLatitudeLetter receives a latitude value and uses the latitudeBands
 // to determine the latitude band letter for that latitude.
 func getLatitudeLetter(latitude float64) (byte, error) {
 	const Lat72 = (72.0 * (math.Pi / 180.0))
@@ -962,7 +965,7 @@ func getLatitudeLetter(latitude float64) (byte, error) {
 		if band < 0 {
 			band = 0
 		}
-		return byte(Latitude_Band_Table[band].letter), nil
+		return byte(latitudeBands[band].letter), nil
 	}
 	return 0, errors.New("latitude out of range")
 }

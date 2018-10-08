@@ -18,7 +18,8 @@ type UTMCoord struct {
 
 // UTM is a UTM coordinate converter
 type UTM struct {
-	CoordinateSystem
+	semiMajorAxis         float64
+	flattening            float64
 	ellipsCode            string
 	utmOverride           int
 	transverseMercatorMap [61]*TransverseMercator

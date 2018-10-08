@@ -7,8 +7,10 @@ import (
 	"github.com/golang/geo/s2"
 )
 
+// Hemisphere represents the hemisphere, north or south
 type Hemisphere byte
 
+// Hemisphere constants
 const (
 	HemisphereInvalid Hemisphere = iota
 	HemisphereNorth
@@ -25,7 +27,8 @@ type UPSCoord struct {
 
 // UPS is a UPS coordinate converter
 type UPS struct {
-	CoordinateSystem
+	semiMajorAxis          float64
+	flattening             float64
 	UPSOriginLatitude      float64
 	polarStereographicMapN *PolarStereographic
 	polarStereographicMapS *PolarStereographic
