@@ -25,7 +25,7 @@ func TestCompleteMGRS(t *testing.T) {
 	}
 	sc := bufio.NewScanner(f)
 
-	polConv, _ := coordconv.MakePolarStereographicScaleFactor(ellipsoidSemiMajorAxis, ellipsoidFlattening, 0, 1.0, coordconv.HemisphereNorth, 0, 0)
+	polConv, _ := coordconv.NewPolarStereographicScaleFactor(ellipsoidSemiMajorAxis, ellipsoidFlattening, 0, 1.0, coordconv.HemisphereNorth, 0, 0)
 	upsConv, _ := coordconv.NewUPS(ellipsoidSemiMajorAxis, ellipsoidFlattening)
 	mgrsConv, _ := coordconv.NewMGRS(ellipsoidSemiMajorAxis, ellipsoidFlattening, "WE")
 
