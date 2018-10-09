@@ -13,11 +13,11 @@ import (
 
 // MGRS is an coordinate converter to and from MGRS coordinates.
 type MGRS struct {
-	semiMajorAxis     float64
-	flattening        float64
-	ups               *UPS
-	utm               *UTM
-	MGRSEllipsoidCode string
+	semiMajorAxis float64
+	flattening    float64
+	ups           *UPS
+	utm           *UTM
+	ellipsoidCode string
 }
 
 const espilon2 = 4.99e-4
@@ -122,7 +122,7 @@ func NewMGRS(ellipsoidSemiMajorAxis, ellipsoidFlattening float64,
 
 	m.semiMajorAxis = ellipsoidSemiMajorAxis
 	m.flattening = ellipsoidFlattening
-	m.MGRSEllipsoidCode = ellipsoidCode
+	m.ellipsoidCode = ellipsoidCode
 
 	var err error
 	m.ups, err = NewUPS(m.semiMajorAxis, m.flattening)
@@ -130,7 +130,7 @@ func NewMGRS(ellipsoidSemiMajorAxis, ellipsoidFlattening float64,
 		return nil, err
 	}
 
-	m.utm, err = NewUTM2(m.semiMajorAxis, m.flattening, m.MGRSEllipsoidCode, 0)
+	m.utm, err = NewUTM2(m.semiMajorAxis, m.flattening, m.ellipsoidCode, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -351,7 +351,7 @@ func (m *MGRS) fromUTM(utmCoordinates UTMCoord, longitude, latitude float64, pre
 		naturalZone = 1
 	}
 	if zone != naturalZone { // reconvert to override zone
-		utmOverride, err := NewUTM2(m.semiMajorAxis, m.flattening, m.MGRSEllipsoidCode, naturalZone)
+		utmOverride, err := NewUTM2(m.semiMajorAxis, m.flattening, m.ellipsoidCode, naturalZone)
 		if err != nil {
 			return "", err
 		}
@@ -392,7 +392,7 @@ func (m *MGRS) fromUTM(utmCoordinates UTMCoord, longitude, latitude float64, pre
 	}
 
 	if override != 0 { // reconvert to override zone
-		utmOverride, err := NewUTM2(m.semiMajorAxis, m.flattening, m.MGRSEllipsoidCode, override)
+		utmOverride, err := NewUTM2(m.semiMajorAxis, m.flattening, m.ellipsoidCode, override)
 		if err != nil {
 			return "", err
 		}
@@ -613,10 +613,10 @@ func (m *MGRS) getGridValues(zone int) (ltr2LowValue, ltr2HighValue int, pattern
 
 	// Pattern based on ellipsoid code
 	var aaPattern bool
-	if m.MGRSEllipsoidCode == clarke1886 ||
-		m.MGRSEllipsoidCode == clarke1880 ||
-		m.MGRSEllipsoidCode == bessel1841 ||
-		m.MGRSEllipsoidCode == bessel1841Namibia {
+	if m.ellipsoidCode == clarke1886 ||
+		m.ellipsoidCode == clarke1880 ||
+		m.ellipsoidCode == bessel1841 ||
+		m.ellipsoidCode == bessel1841Namibia {
 		aaPattern = false
 	} else {
 		aaPattern = true
