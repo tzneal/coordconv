@@ -11,6 +11,9 @@ import (
 
 const nTerms = 6
 
+// TransverseMercator provides conversions between Geodetic coordinates
+// (latitude and longitude) and Transverse Mercator projection coordinates
+// (easting and northing).
 type TransverseMercator struct {
 	// Ellipsoid Parameters
 	semiMajorAxis float64
@@ -37,6 +40,7 @@ type TransverseMercator struct {
 	tranMercDeltaNorthing float64
 }
 
+// NewTransverseMercator constructs a new TransverseMercator converter.
 func NewTransverseMercator(ellipsoidSemiMajorAxis, ellipsoidFlattening, centralMeridian,
 	latitudeOfTrueScale, falseEasting, falseNorthing, scaleFactor float64,
 	ellipsoidCode string) (*TransverseMercator, error) {
@@ -785,7 +789,7 @@ func (t *TransverseMercator) northingEastingToLatLon(northing,
 }
 
 func geodeticLat(sinChi, e float64) float64 {
-	s_old := 1.0e99
+	sOld := 1.0e99
 	s := sinChi
 	onePlusSinChi := 1.0 + sinChi
 	oneMinusSinChi := 1.0 - sinChi
@@ -796,10 +800,10 @@ func geodeticLat(sinChi, e float64) float64 {
 		s = (onePlusSinChi*pSq - oneMinusSinChi) /
 			(onePlusSinChi*pSq + oneMinusSinChi)
 
-		if math.Abs(s-s_old) < 1.0e-12 {
+		if math.Abs(s-sOld) < 1.0e-12 {
 			break
 		}
-		s_old = s
+		sOld = s
 	}
 	return math.Asin(s)
 }

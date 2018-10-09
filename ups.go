@@ -63,10 +63,10 @@ func NewUPS(ellipsoidSemiMajorAxis, ellipsoidFlattening float64) (*UPS, error) {
 
 	u.semiMajorAxis = ellipsoidSemiMajorAxis
 	u.flattening = ellipsoidFlattening
-	u.polarStereographicMapN, _ = MakePolarStereographicScaleFactor(u.semiMajorAxis, u.flattening, upsOriginLatitude,
+	u.polarStereographicMapN, _ = NewPolarStereographicScaleFactor(u.semiMajorAxis, u.flattening, upsOriginLatitude,
 		.994, HemisphereNorth, upsFalseEasting, upsFalseNorthing)
 
-	u.polarStereographicMapS, _ = MakePolarStereographicScaleFactor(u.semiMajorAxis, u.flattening, upsOriginLatitude,
+	u.polarStereographicMapS, _ = NewPolarStereographicScaleFactor(u.semiMajorAxis, u.flattening, upsOriginLatitude,
 		.994, HemisphereSouth, upsFalseEasting, upsFalseNorthing)
 	return u, nil
 }

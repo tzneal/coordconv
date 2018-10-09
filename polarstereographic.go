@@ -8,6 +8,9 @@ import (
 	"github.com/golang/geo/s2"
 )
 
+// PolarStereographic provides conversions between geodetic (latitude and
+// longitude) coordinates and Polar Stereographic (easting and northing)
+// coordinates.
 type PolarStereographic struct {
 	semiMajorAxis        float64
 	flattening           float64
@@ -32,10 +35,10 @@ type PolarStereographic struct {
 	polarScaleFactor float64
 }
 
-// MakePolarStereographic1 receives the ellipsoid parameters and Polar
+// NewPolarStereographic receives the ellipsoid parameters and Polar
 // Stereograpic (Standard Parallel) projection parameters as inputs, and sets
 // the corresponding state variables.
-func MakePolarStereographic1(ellipsoidSemiMajorAxis,
+func NewPolarStereographic(ellipsoidSemiMajorAxis,
 	ellipsoidFlattening,
 	centralMeridian,
 	standardParallel,
@@ -142,10 +145,10 @@ func MakePolarStereographic1(ellipsoidSemiMajorAxis,
 	return p, nil
 }
 
-// MakePolarStereographicScaleFactor ellipsoid parameters and Polar Stereograpic
+// NewPolarStereographicScaleFactor ellipsoid parameters and Polar Stereograpic
 // (Scale Factor) projection parameters as inputs, and sets the corresponding
 // state variables.
-func MakePolarStereographicScaleFactor(ellipsoidSemiMajorAxis,
+func NewPolarStereographicScaleFactor(ellipsoidSemiMajorAxis,
 	ellipsoidFlattening,
 	centralMeridian,
 	scaleFactor float64, hemisphere Hemisphere,
